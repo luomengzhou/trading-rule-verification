@@ -1,0 +1,8 @@
+pandas
+numpy
+yfinance
+vectorbt
+TA-Lib
+akshare
+pyyaml
+matplotlib

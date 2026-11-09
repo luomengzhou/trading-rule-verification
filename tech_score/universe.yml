@@ -1,0 +1,53 @@
+# tech_score universe
+# ============================================================
+# verification: broad market + sector ETFs used to TEST whether
+#   blogger's rules actually work (10+ years of data preferred).
+# personal: user's own watchlist — once a rule is verified, run
+#   the scoring function on these.
+# ============================================================
+
+verification:
+  # 美股大盘 & 风格
+  us_index:
+    - SPY       # S&P 500
+    - QQQ       # Nasdaq 100
+    - IWM       # Russell 2000
+    - DIA       # Dow Jones
+  # 美股行业代表
+  us_sector:
+    - XLK       # Tech
+    - XLF       # Financials
+    - XLE       # Energy
+    - XLV       # Health
+    - XLI       # Industrials
+    - XLY       # Consumer Disc
+    - XLP       # Consumer Staples
+    - XLU       # Utilities
+    - XLB       # Materials
+    - XLRE      # Real Estate
+    - XLC       # Communication
+  # A 股代表 ETF（yfinance 稳定；akshare 端口闪断不可靠）
+  a_index:
+    - "510300.SS"   # 沪深300 ETF
+    - "159915.SZ"   # 创业板 ETF
+    - "510500.SS"   # 中证500 ETF
+    - "512100.SS"   # 中证1000 ETF
+    - "510050.SS"   # 上证50 ETF
+    - "588000.SS"   # 科创50 ETF
+  # 港股
+  hk_index:
+    - "^HSI"        # 恒生指数
+    - "^HSTECH"     # 恒生科技（自动回退 513180.SS）
+  # 大宗商品 / 贵金属 / 加密（博主也会提到）
+  commodity:
+    - GLD           # 黄金
+    - SLV           # 白银
+    - USO           # 原油
+    - IBIT          # 比特币 ETF
+
+personal:
+  # your own watchlist — scored with the composite once rules are verified
+  us:
+    - AAPL
+    - MSFT
+    - NVDA
