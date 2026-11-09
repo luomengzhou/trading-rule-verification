@@ -8,9 +8,9 @@ Trading educators on YouTube teach plenty of indicator rules: "MACD golden cross
 
 **Setup**
 - **Rules:** 19 modules in `tech_score/rules/`: MACD, RSI, KDJ, CCI, Bollinger, ATR/Keltner, Ichimoku, GMMA, BBI, MA, SAR, OBV, WVAD, volume-price, rolling VWAP, Fibonacci, DeMark 9/13, RSI/MACD divergence, and 61 TA-Lib candlestick patterns. Each module's docstring records the rule *as the presenter states it*, including their caveats ("don't trade it below the 30-min chart", "the histogram is optional"). Rules are coded literally, not tuned.
-- **Universe:** 27 liquid instruments (25–26 with usable history) across US index and sector ETFs, China A-share index ETFs, Hang Seng indices, gold, silver, oil and bitcoin (`tech_score/universe.yml`).
-- **Backtest:** daily, ~10 years, long-only (enter on +1, exit on −1), 5 bp fees, `vectorbt`.
-- **Pass bar, fixed in advance:** median Sharpe ≥ 0.3 **and** positive alpha vs buy-and-hold on ≥ 50% of tickers **and** a median drawdown no deeper than buy-and-hold's.
+- **Universe:** 27 liquid instruments listed in `tech_score/universe.yml` across US index and sector ETFs, China A-share index ETFs, Hang Seng indices, gold, silver, oil and bitcoin. 26 produced results (the CSI 1000 ETF `512100.SS` did not return usable data; `rvwap` has 25).
+- **Backtest:** daily bars, `yfinance period=10y` (so up to 10 years ending late 2026; shorter for younger ETFs such as IBIT 2024-, 588000.SS 2020-, XLC 2018-), long-only (enter on +1, exit on −1), 5 bp fees per side, `vectorbt`.
+- **Pass bar, fixed in advance** (encoded in `tech_score/verify.py` before any rule was run): median Sharpe ≥ 0.3 **and** positive alpha vs buy-and-hold on ≥ 50% of tickers **and** a median drawdown no deeper than buy-and-hold's (median rule-DD / B&H-DD ≤ 1).
 
 **Leaderboard** (top and bottom; full table in [`tech_score/results/leaderboard.csv`](tech_score/results/leaderboard.csv))
 
@@ -27,7 +27,7 @@ Trading educators on YouTube teach plenty of indicator rules: "MACD golden cross
 
 - **0 of 19 rules pass.** None beats buy-and-hold on more than 38% of tickers.
 - Several rules (KDJ, Fibonacci, Ichimoku, SAR) do reduce drawdown (DD ratio 0.59–0.73), mostly by sitting out of the market rather than by timing it.
-- **Composite score** (`tech_score/composite.py`): family sub-scores → weighted 0–100 score → buy/sell on a vote threshold. Median Sharpe 0.53 vs 0.72 for buy-and-hold. A regime-aware version (ADX / MA200 / 60-day return classifier in `regime.py`) improves it to 0.61, still below buy-and-hold. Median max drawdown is −33% vs −42%.
+- **Composite score** (`tech_score/composite.py`): family sub-scores → weighted 0–100 score → buy/sell on a vote threshold. Median Sharpe 0.53 vs 0.72 for buy-and-hold, beating B&H on 12% of tickers (`results/composite_verification_norgm.csv`). A regime-aware version (ADX / MA200 / 60-day return classifier in `regime.py`) improves it to 0.61 and 19% of tickers, still below buy-and-hold (`results/composite_verification_regime.csv`). Median max drawdown is −33% (−35% with regime) vs −42% for B&H.
 
 ```bash
 python -m tech_score verify macd          # one rule, prints the verdict
@@ -55,7 +55,10 @@ The data limits are written into each script: yfinance only serves about 60 days
 
 ## Limitations
 
-- In `tech_score`, fills happen at the close of the signal bar (`vectorbt.from_signals` default). Filling at the next open would be stricter.
+- In `tech_score`, every signal is computed from bars up to and including day *t* and filled at day *t*'s close (`vectorbt.from_signals` default). That is slightly optimistic for the rules, so it does not weaken the negative result; filling at the next open would be stricter.
+- Sharpe ratios use vectorbt's default 365-day year, which inflates absolute values by about 20% versus a 252-trading-day convention. Rule and buy-and-hold are affected equally, so the comparison and the pass bar are unchanged.
+- Results in `tech_score/results/` were produced with pandas 2.x. The code now uses `shift(1, fill_value=False)` for the boolean "first bar of a state" checks so it behaves identically on pandas 3.
+- Nothing here is a statistical test: 19 rules on 26 correlated instruments is a small sample, and the rules were chosen because a presenter teaches them, not at random.
 - The universe is ETFs and indices only. Single stocks and shorting are not tested.
 - How I read each rule is a judgement call. The docstrings quote the source wording so the translation can be checked.
 - Code comments are partly in Chinese.
@@ -64,6 +67,9 @@ The data limits are written into each script: yfinance only serves about 60 days
 
 ```bash
 pip install -r requirements.txt   # TA-Lib needs the C library (brew install ta-lib)
+pytest -q                          # 38 smoke tests; need only pandas/numpy
 ```
+
+The intraday scripts additionally need `moomoo-api` and a running moomoo OpenD gateway (see each script's docstring). No market data is redistributed in this repo; the CSVs under `tech_score/results/` are derived statistics only.
 
 Research only, not investment advice.

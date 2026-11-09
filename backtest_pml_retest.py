@@ -27,7 +27,6 @@ import argparse
 from pathlib import Path
 
 import pandas as pd
-import yfinance as yf
 
 TICKERS = ["SMCI", "HOOD", "MU", "AMD", "TGT", "NVDA", "ARM", "AMZN", "GOOGL",
            "COIN", "IWM", "AAPL", "TSLA", "MSFT", "QQQ", "SPY", "META"]
@@ -37,6 +36,7 @@ ENTRY_CUTOFF = "11:30"
 def load(cache: Path | None) -> dict[str, pd.DataFrame]:
     if cache and cache.exists():
         return pd.read_pickle(cache)
+    import yfinance as yf
     raw = yf.download(TICKERS, period="60d", interval="5m", prepost=True,
                       progress=False, auto_adjust=False, group_by="ticker")
     data = {t: raw[t].dropna(subset=["Close"]).tz_convert("America/New_York")

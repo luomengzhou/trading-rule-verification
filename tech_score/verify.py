@@ -4,10 +4,14 @@ For each symbol in verification universe, run the rule, build a long-only strate
   - Enter on signal=+1, exit on signal=-1 (or on opposite signal), hold otherwise.
 Compare to Buy&Hold: total return, Sharpe, max drawdown, win rate, # trades.
 
-A rule is considered "validated" if across the verification universe it shows:
+A rule is considered "validated" (bar fixed before any rule was run) if across the
+verification universe it shows all three of:
   - Median Sharpe ≥ 0.3
-  - Positive expectancy in > 60% of tickers
-  - Max drawdown ≤ Buy&Hold max drawdown on the same ticker
+  - Positive alpha vs Buy&Hold on ≥ 50% of tickers
+  - Median drawdown ratio (rule max DD / Buy&Hold max DD) ≤ 1.0
+
+Fills: vectorbt `from_signals` executes at the close of the signal bar (same bar the
+indicator is computed on). Sharpe/annualisation use vectorbt defaults (365-day year).
 """
 from __future__ import annotations
 

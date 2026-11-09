@@ -12,8 +12,9 @@ Forward-adjusted history changes on each new dividend/split, so bars are never
 appended: delete the cache and rerun to refresh.
 
 Usage:
-    ~/.venvs/moomoo/bin/python fetch_bars5m.py [--out bars5m.pkl] [--tickers NVDA AMD]
-    ~/.venvs/moomoo/bin/python backtest_pml_retest.py --cache bars5m.pkl
+    pip install moomoo-api
+    python fetch_bars5m.py [--out bars5m.pkl] [--tickers NVDA AMD]
+    python backtest_pml_retest.py --cache bars5m.pkl
 """
 import argparse
 import time
@@ -21,9 +22,10 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
-from moomoo import AuType, KLType, OpenQuoteContext, RET_OK, Session
-
 from backtest_pml_retest import TICKERS
+
+# moomoo-api is only needed to download; imported lazily so `normalize` and the
+# unit tests work without it.
 
 START = "2018-10-01"     # earliest 5m RTH history; real pre-market starts ~2020
 COLUMNS = {"open": "Open", "high": "High", "low": "Low", "close": "Close",
@@ -43,7 +45,9 @@ def normalize(raw: pd.DataFrame) -> pd.DataFrame:
     return df.between_time("04:00", "19:55").sort_index().tz_localize("America/New_York")
 
 
-def fetch(ctx: OpenQuoteContext, ticker: str) -> pd.DataFrame:
+def fetch(ctx, ticker: str) -> pd.DataFrame:
+    from moomoo import AuType, KLType, RET_OK, Session
+
     pages, key = [], None
     while True:
         ret, page, key = ctx.request_history_kline(
@@ -61,6 +65,8 @@ def main():
     ap.add_argument("--out", type=Path, default=Path("bars5m.pkl"))
     ap.add_argument("--tickers", nargs="+", default=TICKERS)
     args = ap.parse_args()
+
+    from moomoo import OpenQuoteContext
 
     data = pd.read_pickle(args.out) if args.out.exists() else {}
     tmp = args.out.with_suffix(".tmp")

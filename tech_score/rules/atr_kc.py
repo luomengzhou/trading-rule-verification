@@ -38,7 +38,7 @@ def signal(df: pd.DataFrame) -> pd.Series:
 
     # Sell: 上升通道 + 过去 3 日触过上轨 + 今天中轨破位
     touched_recent = touch_up.rolling(3).max() > 0
-    sell = slope_up & touched_recent & break_mid & ~break_mid.shift(1).fillna(False)
+    sell = slope_up & touched_recent & break_mid & ~break_mid.shift(1, fill_value=False)
 
     s = pd.Series(0, index=df.index, dtype=int)
     s[buy] = 1

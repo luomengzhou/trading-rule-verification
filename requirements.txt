@@ -1,8 +1,17 @@
-pandas
-numpy
-yfinance
-vectorbt
-TA-Lib
-akshare
-pyyaml
-matplotlib
+# core (tech_score rules, composite, tests)
+pandas>=2.0
+numpy>=1.24
+pyyaml>=6.0
+
+# data + backtest engine for `python -m tech_score ...`
+yfinance>=0.2
+vectorbt>=0.26
+TA-Lib>=0.4          # needs the C library first: brew install ta-lib / apt install libta-lib-dev
+akshare>=1.12        # optional fallback for A-share data
+
+# legacy toolkit (signal_generator.py, backtest.py, risk_manager.py, analyzer.py)
+matplotlib>=3.7
+
+# optional, intraday option re-test only (fetch_bars5m.py, backtest_pml_options.py);
+# also requires a running moomoo OpenD gateway
+# moomoo-api>=9.0

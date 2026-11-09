@@ -28,17 +28,17 @@ def signal(df: pd.DataFrame, window: int = 60) -> pd.Series:
 
     # 回撤到支撑企稳：连续 2 根 K 线 pos 落在 [0.382, 0.618] 后企稳上行
     in_support = (pos >= 0.382) & (pos <= 0.618)
-    reclaim = (c > c.shift(1)) & in_support.shift(1).fillna(False) & up
+    reclaim = (c > c.shift(1)) & in_support.shift(1, fill_value=False) & up
     buy = reclaim
 
     # 扩展位回落：触及 pos >= 0.95 (接近 swing high) + 今天下跌
     near_top = pos >= 0.95
-    sell = near_top.shift(1).fillna(False) & (c < c.shift(1)) & up
+    sell = near_top.shift(1, fill_value=False) & (c < c.shift(1)) & up
 
     # 下跌趋势中对称处理
     near_bot = pos <= 0.05
-    sell_dn = near_bot.shift(1).fillna(False) & (c < c.shift(1)) & dn
-    buy_dn = (pos >= 0.382) & (pos <= 0.618) & dn & (c > c.shift(1)) & reclaim.shift(1).fillna(False)
+    sell_dn = near_bot.shift(1, fill_value=False) & (c < c.shift(1)) & dn
+    buy_dn = (pos >= 0.382) & (pos <= 0.618) & dn & (c > c.shift(1)) & reclaim.shift(1, fill_value=False)
 
     s = pd.Series(0, index=df.index, dtype=int)
     s[buy | buy_dn] = 1

@@ -20,6 +20,6 @@ def signal(df: pd.DataFrame) -> pd.Series:
     bull = close > sar
     bear = close < sar
     s = pd.Series(0, index=df.index, dtype=int)
-    s[bull & ~bull.shift(1).fillna(False)] = 1
-    s[bear & ~bear.shift(1).fillna(False)] = -1
+    s[bull & ~bull.shift(1, fill_value=False)] = 1
+    s[bear & ~bear.shift(1, fill_value=False)] = -1
     return s

@@ -191,12 +191,12 @@ def composite_signal(df: pd.DataFrame, hi: float = 65, lo: float = 35,
         rng_exit = exit_ & rng
 
         s = pd.Series(0, index=df.index, dtype=int)
-        s[(trend_up_start | rng_enter) & ~(trend_up_start | rng_enter).shift(1).fillna(False)] = 1
-        s[(rng_exit | down_exit) & ~(rng_exit | down_exit).shift(1).fillna(False)] = -1
+        s[(trend_up_start | rng_enter) & ~(trend_up_start | rng_enter).shift(1, fill_value=False)] = 1
+        s[(rng_exit | down_exit) & ~(rng_exit | down_exit).shift(1, fill_value=False)] = -1
         return s
 
     # no-regime mode
     s = pd.Series(0, index=df.index, dtype=int)
-    s[enter & ~enter.shift(1).fillna(False)] = 1
-    s[exit_ & ~exit_.shift(1).fillna(False)] = -1
+    s[enter & ~enter.shift(1, fill_value=False)] = 1
+    s[exit_ & ~exit_.shift(1, fill_value=False)] = -1
     return s

@@ -18,8 +18,9 @@ signal(df) 返回 {-1, 0, +1} 的 pd.Series（每根 K 线一个信号）：
   -1 = 博主规则下"明确空 / 卖"
    0 = 观望
 
-NOTE: signal 是基于当日收盘后的状态（计算完指标再发信号），回测引擎需要在
-      次日开盘执行以避免 look-ahead bias。vectorbt 的 from_signals 默认下一根 K 线成交。
+NOTE: signal 是基于当日收盘后的状态（计算完指标再发信号）。verify.py 用的
+      vectorbt `from_signals` 默认在信号 K 线的收盘价成交（同一根 K 线），
+      这是一个已知的乐观假设，见 README Limitations；更严格的做法是次日开盘成交。
 """
 from __future__ import annotations
 

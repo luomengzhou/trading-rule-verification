@@ -1,4 +1,4 @@
-"""运行：~/.venvs/moomoo/bin/python -m unittest test_fetch_bars5m"""
+"""运行：python -m unittest test_fetch_bars5m"""
 
 import unittest
 

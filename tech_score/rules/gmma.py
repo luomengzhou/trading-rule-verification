@@ -31,8 +31,8 @@ def signal(df: pd.DataFrame) -> pd.Series:
     bull = short_min > long_max   # 短组全部 > 长组最大 = 彻底分离向上
     bear = short_max < long_min   # 短组全部 < 长组最小 = 彻底分离向下
 
-    new_bull = bull & ~bull.shift(1).fillna(False)
-    new_bear = bear & ~bear.shift(1).fillna(False)
+    new_bull = bull & ~bull.shift(1, fill_value=False)
+    new_bear = bear & ~bear.shift(1, fill_value=False)
 
     s = pd.Series(0, index=df.index, dtype=int)
     s[new_bull] = 1

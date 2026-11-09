@@ -14,7 +14,7 @@ Data limits:
     delta 0.5. Bars without trades carry the last trade forward.
 
 Usage:
-    ~/.venvs/moomoo/bin/python backtest_pml_options.py --cache bars5m.pkl --opt-cache opt.pkl
+    python backtest_pml_options.py --cache bars5m.pkl --opt-cache opt.pkl
 """
 import argparse
 import time
@@ -22,7 +22,6 @@ from datetime import timedelta
 from pathlib import Path
 
 import pandas as pd
-from moomoo import KLType, OpenQuoteContext, RET_OK, Session
 
 from backtest_pml_retest import day_change_series
 from backtest_pml_vwap_v2 import simulate
@@ -59,6 +58,8 @@ def expiries(d, ticker):
 
 
 def fetch(ctx, code, day):
+    from moomoo import KLType, RET_OK, Session
+
     time.sleep(0.6)  # request_history_kline: 60 calls / 30s
     ret, df, _ = ctx.request_history_kline(code, start=str(day), end=str(day), ktype=KLType.K_5M,
                                            session=Session.ALL, max_count=500)
@@ -121,6 +122,8 @@ def main():
     sig = signals(data)
     sig = sig[sig["date"].astype(str) >= args.since].reset_index(drop=True)
     cache = pd.read_pickle(args.opt_cache) if args.opt_cache.exists() else {}
+
+    from moomoo import OpenQuoteContext  # needs OpenD running; pip install moomoo-api
 
     ctx = OpenQuoteContext(host="127.0.0.1", port=11111, ai_type=1)
     try:
